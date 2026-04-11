@@ -1,0 +1,35 @@
+{
+  "name": "crypto-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for crypto and finance data via CoinGecko",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "crypto-mcp": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "node --test build/test/helpers.test.js",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "crypto",
+    "coingecko",
+    "bitcoin",
+    "ethereum"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0"
+  }
+}
