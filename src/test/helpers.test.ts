@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { formatUSD, formatPercent, formatLargeNumber } from "../index.js";
+import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
 
 describe("formatUSD", () => {
   it("formats large numbers with 2 decimal places", () => {
