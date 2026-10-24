@@ -5,7 +5,7 @@
  * See src/tools/get-crypto-price.ts for the TOOLS concept overview.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { geckoFetch } from "../api/coingecko.js";
 import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
@@ -17,14 +17,14 @@ export function register(server: McpServer) {
       title: "Get Top Coins",
       description:
         "Get the top cryptocurrencies ranked by market cap, with current prices and 24h changes.",
-      inputSchema: {
+      inputSchema: z.object({
         limit: z
           .number()
           .min(1)
           .max(25)
           .default(10)
           .describe("Number of coins to return (1-25, default 10)"),
-      },
+      }),
     },
     async ({ limit }) => {
       const data = (await geckoFetch(

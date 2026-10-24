@@ -24,8 +24,8 @@
  * variable extraction. You just provide the callbacks.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ResourceTemplate } from "@modelcontextprotocol/server";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { geckoFetch, sanitizeCoinId } from "../api/coingecko.js";
 import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
 

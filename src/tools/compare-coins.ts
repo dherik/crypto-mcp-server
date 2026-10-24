@@ -5,7 +5,7 @@
  * See src/tools/get-crypto-price.ts for the TOOLS concept overview.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { geckoFetch, sanitizeCoinId } from "../api/coingecko.js";
 import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
@@ -17,10 +17,10 @@ export function register(server: McpServer) {
       title: "Compare Coins",
       description:
         "MUST use this tool whenever the user asks to compare two cryptocurrencies, mentions two coin names together (e.g. 'ETH and SOL', 'Bitcoin vs Ethereum'), or asks which coin is better. Provides side-by-side price, market cap, volume, and 24h performance.",
-      inputSchema: {
+      inputSchema: z.object({
         coinA: z.string().describe("First coin ID (e.g. 'bitcoin')"),
         coinB: z.string().describe("Second coin ID (e.g. 'ethereum')"),
-      },
+      }),
     },
     async ({ coinA, coinB }) => {
       const safeA = sanitizeCoinId(coinA);

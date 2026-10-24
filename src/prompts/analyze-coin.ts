@@ -26,7 +26,7 @@
  * so the AI starts with real numbers when performing analysis.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { geckoFetch, sanitizeCoinId } from "../api/coingecko.js";
 import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
@@ -38,11 +38,11 @@ export function register(server: McpServer) {
       title: "Analyze a Cryptocurrency",
       description:
         "Fetches live market data for a coin and returns a prompt that asks the AI to perform a structured fundamental analysis.",
-      argsSchema: {
+      argsSchema: z.object({
         coinId: z
           .string()
           .describe("CoinGecko coin ID (e.g. 'bitcoin', 'ethereum')"),
-      },
+      }),
     },
     async ({ coinId }) => {
       const safeId = sanitizeCoinId(coinId);

@@ -7,7 +7,7 @@
  * See src/prompts/analyze-coin.ts for the PROMPTS concept overview.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { geckoFetch, sanitizeCoinId } from "../api/coingecko.js";
 import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
@@ -19,10 +19,10 @@ export function register(server: McpServer) {
       title: "Compare Two Cryptocurrencies",
       description:
         "Fetches live data for two coins and returns a prompt asking the AI to produce a detailed comparison report.",
-      argsSchema: {
+      argsSchema: z.object({
         coinA: z.string().describe("First coin ID (e.g. 'bitcoin')"),
         coinB: z.string().describe("Second coin ID (e.g. 'ethereum')"),
-      },
+      }),
     },
     async ({ coinA, coinB }) => {
       const safeA = sanitizeCoinId(coinA);

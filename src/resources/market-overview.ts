@@ -31,7 +31,7 @@
  * that returns global market metrics.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { geckoFetch } from "../api/coingecko.js";
 import { formatPercent, formatLargeNumber } from "../formatting.js";
 

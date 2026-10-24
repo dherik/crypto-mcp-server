@@ -31,9 +31,11 @@
  *      guide the AI's response. They accept arguments (Zod schemas).
  *      → Good for structured analysis workflows.
  *
- *   4. **SAMPLING** — The server asks the client's LLM to generate text.
- *      Used in src/tools/get-ai-insight.ts. The server fetches live data,
- *      sends it to the LLM via createMessage(), and returns the result.
+ *   4. **SAMPLING (via input_required)** — The server asks the client's
+ *      LLM to generate text. Used in src/tools/get-ai-insight.ts. The
+ *      server fetches live data, returns an `input_required` result with
+ *      an embedded LLM request, and the client answers it and retries
+ *      the call (Multi Round-Trip Requests).
  *      → The most advanced MCP feature. Client must support it.
  *
  * ─── ARCHITECTURE ───
@@ -56,10 +58,19 @@
  * This server uses **stdio transport** — it reads JSON-RPC from stdin
  * and writes JSON-RPC to stdout. The AI client spawns this process
  * and communicates with it directly. No HTTP server needed.
+ *
+ * The server is built through a FACTORY (`createServer`) and served
+ * with `serveStdio`, which owns the transport. This is the MCP
+ * TypeScript SDK v2 shape, and it lets the server speak the stateless
+ * `2026-07-28` protocol revision: every request is self-describing
+ * (protocol version, client info, and capabilities travel in `_meta`),
+ * there is no initialize handshake and no session. Older 2025-era
+ * clients are still served from the same factory via the legacy
+ * `initialize` handshake.
  */
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { McpServer } from "@modelcontextprotocol/server";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
 import { register as registerGetCryptoPrice } from "./tools/get-crypto-price.js";
 import { register as registerGetTopCoins } from "./tools/get-top-coins.js";
@@ -72,26 +83,31 @@ import { register as registerCoinProfileResource } from "./resources/coin-profil
 import { register as registerAnalyzeCoinPrompt } from "./prompts/analyze-coin.js";
 import { register as registerCompareReportPrompt } from "./prompts/compare-report.js";
 
-const server = new McpServer({
-  name: "crypto-mcp-server",
-  version: "1.0.0",
-});
+/**
+ * Builds a fully-registered server instance.
+ *
+ * The factory shape is what allows stateless serving: a fresh instance
+ * handles each connection (HTTP) or the single stdio connection, and
+ * no state is shared between them.
+ */
+export function createServer() {
+  const server = new McpServer({
+    name: "crypto-mcp-server",
+    version: "1.0.0",
+  });
 
-registerGetCryptoPrice(server);
-registerGetTopCoins(server);
-registerCompareCoins(server);
-registerGetMarketOverview(server);
-registerGetCoinHistory(server);
-registerGetAiInsight(server);
-registerMarketOverviewResource(server);
-registerCoinProfileResource(server);
-registerAnalyzeCoinPrompt(server);
-registerCompareReportPrompt(server);
+  registerGetCryptoPrice(server);
+  registerGetTopCoins(server);
+  registerCompareCoins(server);
+  registerGetMarketOverview(server);
+  registerGetCoinHistory(server);
+  registerGetAiInsight(server);
+  registerMarketOverviewResource(server);
+  registerCoinProfileResource(server);
+  registerAnalyzeCoinPrompt(server);
+  registerCompareReportPrompt(server);
 
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Crypto MCP server running on stdio");
+  return server;
 }
 
 const isMainModule =
@@ -99,10 +115,10 @@ const isMainModule =
   process.argv[1]?.endsWith("build\\index.js");
 
 if (isMainModule) {
-  main().catch((err) => {
-    console.error("Fatal error:", err);
-    process.exit(1);
+  const handle = serveStdio(createServer);
+  console.error("Crypto MCP server running on stdio (protocol 2026-07-28)");
+
+  process.on("SIGINT", () => {
+    void handle.close();
   });
 }
-
-export { server };

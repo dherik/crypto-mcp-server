@@ -10,11 +10,11 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "node --test build/test/helpers.test.js",
+    "test": "node --test \"build/test/*.test.js\"",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "keywords": [
     "mcp",
@@ -25,10 +25,11 @@
     "ethereum"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^3.25.0"
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.2.0"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
     "@types/node": "^22.0.0",
     "typescript": "^5.8.0"
   }

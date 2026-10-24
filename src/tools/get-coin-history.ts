@@ -5,7 +5,7 @@
  * See src/tools/get-crypto-price.ts for the TOOLS concept overview.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { geckoFetch, sanitizeCoinId } from "../api/coingecko.js";
 import { formatUSD, formatPercent } from "../formatting.js";
@@ -17,7 +17,7 @@ export function register(server: McpServer) {
       title: "Get Coin Price History",
       description:
         "Get the price history of a cryptocurrency over a number of days, with high/low/open/close summary.",
-      inputSchema: {
+      inputSchema: z.object({
         coinId: z.string().describe("CoinGecko coin ID (e.g. 'bitcoin')"),
         days: z
           .number()
@@ -25,7 +25,7 @@ export function register(server: McpServer) {
           .max(365)
           .default(7)
           .describe("Number of days of history to retrieve (1-365, default 7)"),
-      },
+      }),
     },
     async ({ coinId, days }) => {
       const safeId = sanitizeCoinId(coinId);

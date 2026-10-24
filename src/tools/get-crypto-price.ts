@@ -20,7 +20,7 @@
  * This file registers the "get_crypto_price" tool with the MCP server.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { geckoFetch, sanitizeCoinId } from "../api/coingecko.js";
 import { formatUSD, formatPercent, formatLargeNumber } from "../formatting.js";
@@ -32,13 +32,13 @@ export function register(server: McpServer) {
       title: "Get Crypto Price",
       description:
         "Get the current price, market cap, 24h volume, and 24h price change for a cryptocurrency. Use coin IDs like 'bitcoin', 'ethereum', 'solana', 'cardano'.",
-      inputSchema: {
+      inputSchema: z.object({
         coinId: z
           .string()
           .describe(
             "CoinGecko coin ID (e.g. 'bitcoin', 'ethereum', 'solana')"
           ),
-      },
+      }),
     },
     async ({ coinId }) => {
       const safeId = sanitizeCoinId(coinId);

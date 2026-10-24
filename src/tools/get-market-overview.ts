@@ -5,9 +5,10 @@
  * See src/tools/get-crypto-price.ts for the TOOLS concept overview.
  */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { geckoFetch } from "../api/coingecko.js";
 import { formatPercent, formatLargeNumber } from "../formatting.js";
+import { z } from "zod";
 
 export function register(server: McpServer) {
   server.registerTool(
@@ -16,7 +17,7 @@ export function register(server: McpServer) {
       title: "Get Market Overview",
       description:
         "Get a global overview of the crypto market: total market cap, BTC dominance, 24h volume, and number of active coins.",
-      inputSchema: {},
+      inputSchema: z.object({}),
     },
     async () => {
       const data = (await geckoFetch(`/global`)) as {
